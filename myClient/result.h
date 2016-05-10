@@ -19,7 +19,7 @@ public:
     int itemsCount;
     ~result();
 signals:
-    void itemToBasket(QString,int,float);
+    void itemToBasket(QString,QString,float);
     void showBasket();
 public slots:
     void getQueryResult(QStringList);

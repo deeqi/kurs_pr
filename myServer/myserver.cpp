@@ -57,8 +57,12 @@ void myServer::slotReadClient()
         QTime   time;
         QString str;
         in >> time >> str;
-
         ui->serverInfo->append(str);
+
+        if(str[0]=='i'){
+            ui->serverInfo->append("2");
+        }
+        else{
         ui->serverInfo->append(generateQuery(str));
 
         QSqlQuery query;
@@ -75,9 +79,9 @@ void myServer::slotReadClient()
              value += query.value(3).toString();
              queryResult.append(value);
         }
-
-        nextBlockSize = 0;
         sendToClient(pClientSocket, queryResult);
+        }
+        nextBlockSize = 0;
     }
 }
 
@@ -100,7 +104,7 @@ QString myServer::generateQuery(const QString &parameters)      //создани
     QString dbSubQuery = "(SELECT ";
     QStringList params = parameters.split(",");
     int emptyCheck = 0;
-    for (int m =0; m<params.length();m++){
+    for (int m = 3; m<params.length();m++){
         if (!params[m].isEmpty()) emptyCheck++;
     }
     params.removeLast();
@@ -108,7 +112,7 @@ QString myServer::generateQuery(const QString &parameters)      //создани
     //подзапрос для процессора
     if(params[0]=="cpu"){
         dbSubQuery+="cpuid FROM cpu ";
-        if (emptyCheck>1) dbSubQuery+="WHERE ";
+        if (emptyCheck>=1) dbSubQuery+="WHERE ";
         if(!params[3].isEmpty()){
             dbSubQuery+="(manufacturer = '";
             QStringList param3 = params[3].split(" ");
@@ -145,7 +149,7 @@ QString myServer::generateQuery(const QString &parameters)      //создани
     }
     if(params[0]=="gpu"){
         dbSubQuery+="gpuid FROM gpu ";
-        if (emptyCheck>1) dbSubQuery+="WHERE ";
+        if (emptyCheck>=1) dbSubQuery+="WHERE ";
         if(!params[3].isEmpty()){
             dbSubQuery+="(manufacturer = '";
             QStringList param3 = params[3].split("/");
@@ -194,7 +198,7 @@ QString myServer::generateQuery(const QString &parameters)      //создани
 
     if(params[0]=="mboard"){
         dbSubQuery+="mboardid FROM mboard ";
-        if (emptyCheck>1) dbSubQuery+="WHERE ";
+        if (emptyCheck>=1) dbSubQuery+="WHERE ";
         if(!params[3].isEmpty()){
             dbSubQuery+="(memory_slots = ";
             QStringList param3 = params[3].split(" ");
@@ -242,7 +246,7 @@ QString myServer::generateQuery(const QString &parameters)      //создани
         }
     if(params[0]=="hdd"){
         dbSubQuery+="hddid FROM hdd ";
-        if (emptyCheck>1) dbSubQuery+="WHERE ";
+        if (emptyCheck>=1) dbSubQuery+="WHERE ";
         if(!params[3].isEmpty()){
             dbSubQuery+="(interface = '";
             QStringList param3 = params[3].split("/");
@@ -291,7 +295,7 @@ QString myServer::generateQuery(const QString &parameters)      //создани
 
     if(params[0]=="ram"){
         dbSubQuery+="ramid FROM ram ";
-        if (emptyCheck>1) dbSubQuery+="WHERE ";
+        if (emptyCheck>=1) dbSubQuery+="WHERE ";
         if(!params[3].isEmpty()){
             dbSubQuery+="(memory_frequency  ";
             QStringList param3 = params[3].split("/");

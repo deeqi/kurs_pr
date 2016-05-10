@@ -12,15 +12,16 @@ MyClient::MyClient(const QString& hostName, int nPort,QWidget *parent) :
 
     res = new result();
     connect(this,SIGNAL(sendQueryResult(QStringList)),res,SLOT(getQueryResult(QStringList)));
-    connect(res,SIGNAL(itemToBasket(QString,int,float)),bask,SLOT(addToBasket(QString,int,float)));
+    connect(res,SIGNAL(itemToBasket(QString,QString,float)),bask,SLOT(addToBasket(QString,QString,float)));
     connect(res,SIGNAL(showBasket()),bask,SLOT(show()));
+    connect(bask,SIGNAL(sendOrderData(QString)),this,SLOT(getOrderData(QString)));
 
     connect(socket,SIGNAL(connected()),this,SLOT(slotConnected()));
     connect(socket,SIGNAL(readyRead()),this,SLOT(slotReadyRead()));
     connect(socket,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(slotError(QAbstractSocket::SocketError)));
 
     //настройки интерфейса
-    connect(ui->sendButton,SIGNAL(clicked(bool)),this,SLOT(slotSendToServer()));
+    connect(this,SIGNAL(sendUserQuery(QString)),this,SLOT(slotSendToServer(QString)));
     //ограничения на ввод цены
     ui->lowPrice->setValidator(new QIntValidator(0, 100000, ui->lowPrice));
     ui->maxPrice->setValidator(new QIntValidator(0, 100000, ui->maxPrice));
@@ -108,17 +109,16 @@ void MyClient::slotError(QAbstractSocket::SocketError err)
 
 }
 
-void MyClient::slotSendToServer()
+void MyClient::slotSendToServer(QString query)
 {
     QByteArray  arrBlock;
     QDataStream out(&arrBlock, QIODevice::WriteOnly);
-    out << quint16(0) << QTime::currentTime() << userQuery;
+    out << quint16(0) << QTime::currentTime() << query;
 
     out.device()->seek(0);
     out << quint16(arrBlock.size() - sizeof(quint16));
 
     socket->write(arrBlock);
-
 }
 
 void MyClient::slotConnected()
@@ -508,10 +508,20 @@ void MyClient::on_sendButton_clicked()              //кнопка "выбрат
         if (ui->arg4_6->isChecked())memory+="16 ";
         userQuery+=memory+",";
     }
+    emit sendUserQuery(userQuery);
 }
 
 void MyClient::on_reconnectButton_clicked()         //кнопка "переподключиться"
 {
     ui->serverStatus->clear();
     socket->connectToHost("localhost",1234);
+}
+
+void MyClient::getOrderData(QString orderData){
+    emit sendUserQuery(orderData);
+}
+
+void MyClient::on_pushButton_clicked()
+{
+    bask->show();
 }

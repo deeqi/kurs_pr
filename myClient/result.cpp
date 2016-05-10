@@ -52,10 +52,10 @@ void result::on_pushButton_2_clicked()
     ui->pushButton_3->setDisabled(0);
     QString item;
     QList<QTableWidgetItem*> selectedItem = ui->tableWidget->selectedItems();
-    int id; float price;
+    QString id; float price;
     if(selectedItem.length() != 0){
         item+=selectedItem[0]->text()+", ";
-        id = selectedItem[0]->text().toInt();
+        id = selectedItem[0]->text();
         item+=selectedItem[1]->text()+", ";
         item+=selectedItem[2]->text()+" р.";
         price = selectedItem[2]->text().toFloat();

@@ -26,6 +26,9 @@ public:
     ~MyClient();
 signals:
     void sendQueryResult(QStringList);
+    void sendUserQuery(QString);
+public slots:
+    void getOrderData(QString);
 private:
     void clearItemMenu();
     quint16 nextBlockSize;
@@ -33,12 +36,13 @@ private:
 private slots:
     void slotReadyRead   ();
     void slotError       (QAbstractSocket::SocketError);
-    void slotSendToServer();
+    void slotSendToServer(QString);
     void slotConnected   ();
     void on_closeButton_clicked();
     void on_itemList_currentIndexChanged(const QString &arg1);
     void on_sendButton_clicked();
     void on_reconnectButton_clicked();
+    void on_pushButton_clicked();
 };
 
 #endif // MYCLIENT_H
