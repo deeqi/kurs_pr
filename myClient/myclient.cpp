@@ -12,7 +12,7 @@ MyClient::MyClient(const QString& hostName, int nPort,QWidget *parent) :
 
     res = new result();
     connect(this,SIGNAL(sendQueryResult(QStringList)),res,SLOT(getQueryResult(QStringList)));
-    connect(res,SIGNAL(itemToBasket(QString,QString,float)),bask,SLOT(addToBasket(QString,QString,float)));
+    connect(res,SIGNAL(itemToBasket(QString,QString,float,QString)),bask,SLOT(addToBasket(QString,QString,float,QString)));
     connect(res,SIGNAL(showBasket()),bask,SLOT(show()));
     connect(bask,SIGNAL(sendOrderData(QString)),this,SLOT(getOrderData(QString)));
 
@@ -359,6 +359,8 @@ void MyClient::on_sendButton_clicked()              //кнопка "выбрат
         if (ui->arg2_2->isChecked())kernels+="4 ";
         if (ui->arg2_3->isChecked())kernels+="6 ";
         if (ui->arg2_4->isChecked())kernels+="8 ";
+        if (ui->arg2_5->isChecked())kernels+="10 ";
+        if (ui->arg2_6->isChecked())kernels+="12 ";
         userQuery+=kernels+",";
         //частота
         QString frequency;
@@ -508,7 +510,10 @@ void MyClient::on_sendButton_clicked()              //кнопка "выбрат
         if (ui->arg4_6->isChecked())memory+="16 ";
         userQuery+=memory+",";
     }
-    emit sendUserQuery(userQuery);
+    if (ui->lowPrice->text().toInt() >= ui->maxPrice->text().toInt()){
+        ui->priceError->setText("Неправильно указана цена!");
+    }
+    else emit sendUserQuery(userQuery);
 }
 
 void MyClient::on_reconnectButton_clicked()         //кнопка "переподключиться"

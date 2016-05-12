@@ -41,7 +41,7 @@ void result::on_pushButton_clicked()
     this->close();
 }
 
-void result::on_tableWidget_cellClicked(int row, int column)
+void result::on_tableWidget_cellClicked(int row)
 {
     ui->tableWidget->selectRow(row);
 }
@@ -52,17 +52,19 @@ void result::on_pushButton_2_clicked()
     ui->pushButton_3->setDisabled(0);
     QString item;
     QList<QTableWidgetItem*> selectedItem = ui->tableWidget->selectedItems();
-    QString id; float price;
+    QString id,sup; float price;
     if(selectedItem.length() != 0){
         item+=selectedItem[0]->text()+", ";
         id = selectedItem[0]->text();
-        item+=selectedItem[1]->text()+", ";
+        item+=selectedItem[1]->text()+",";
+        item+=selectedItem[3]->text()+" - ";
         item+=selectedItem[2]->text()+" р.";
         price = selectedItem[2]->text().toFloat();
+        sup = selectedItem[3]->text().split("(").at(1);
+        sup.remove(sup.length()-1,1);
         itemsCount++;
         ui->label_2->setText("Товар добавлен в корзину");
-        ui->pushButton_3->setText("Корзина ("+QString::number(itemsCount)+")");
-        emit itemToBasket(item,id,price);
+        emit itemToBasket(item,id,price,sup);
     }
     else ui->label_2->setText("Сначала выберите товар");
 

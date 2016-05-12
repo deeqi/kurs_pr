@@ -19,13 +19,13 @@ public:
     int itemsCount;
     ~result();
 signals:
-    void itemToBasket(QString,QString,float);
+    void itemToBasket(QString,QString,float,QString);
     void showBasket();
 public slots:
     void getQueryResult(QStringList);
 private slots:
     void on_pushButton_clicked();
-    void on_tableWidget_cellClicked(int row, int column);
+    void on_tableWidget_cellClicked(int row);
 
     void on_pushButton_2_clicked();
 

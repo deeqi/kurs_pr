@@ -31,6 +31,7 @@ private slots:
 
 private:
     void sendToClient(QTcpSocket* pSocket, const QStringList& query);
+    void insertQuery(const QString& orderData);
     QString generateQuery(const QString& parameters);
     QTcpServer* server;
     quint16     nextBlockSize;

@@ -57,14 +57,13 @@ void myServer::slotReadClient()
         QTime   time;
         QString str;
         in >> time >> str;
+
         ui->serverInfo->append(str);
 
         if(str[0]=='i'){
-            ui->serverInfo->append("2");
+            insertQuery(str);
         }
         else{
-        ui->serverInfo->append(generateQuery(str));
-
         QSqlQuery query;
         query.exec(generateQuery(str));
 
@@ -76,7 +75,8 @@ void myServer::slotReadClient()
              value += query.value(0).toString()+"/";
              value += query.value(1).toString()+"/";
              value += query.value(2).toString()+"/";
-             value += query.value(3).toString();
+             value += query.value(3).toString()+"(";
+             value += query.value(4).toString()+")";
              queryResult.append(value);
         }
         sendToClient(pClientSocket, queryResult);
@@ -96,10 +96,60 @@ void myServer::sendToClient(QTcpSocket* pSocket, const QStringList& query)
 
     pSocket->write(arrBlock);
 }
-
-QString myServer::generateQuery(const QString &parameters)      //создание запроса к бд из параметров
+void myServer::insertQuery(const QString &orderData)      //создание insert запроса к бд из параметров
 {
-    QString dbQuery = "SELECT details.detailid, details.title, pricelist.price, supplier.name "
+    QStringList dataList;
+    QSqlQuery query;
+    QString clientId,orderId,dbQuery;
+    int newId;
+
+    //формирование id для клиента
+    query.exec("SELECT max(clientid) FROM clients;");
+    while (query.next()) {clientId = query.value(0).toString();}
+    newId = clientId.toInt() + 1;
+    clientId = QString::number(newId);
+
+    //формирование id для заказа
+    query.exec("SELECT max(orderid) FROM orders;");
+    while (query.next()) {orderId = query.value(0).toString();}
+    newId = orderId.toInt() + 1;
+    orderId = QString::number(newId);
+
+    dataList = orderData.split("/");
+    dataList.removeLast();
+
+    dbQuery = "INSERT INTO clients (clientid,fname,lname,phone,adress) VALUES ("+
+            clientId+",'"+dataList[1]+"','"+dataList[2]+"','"+dataList[3]+"','"+dataList[4]+"')";
+    query.exec(dbQuery);
+    dbQuery.clear();
+
+    dbQuery = "INSERT INTO orders (clientid,orderid) VALUES ("+clientId+","+orderId+")";
+    query.exec(dbQuery);
+    dbQuery.clear();
+
+    dbQuery = "INSERT INTO content (orderid,clientid,detailid,supid,price,quantity) VALUES ";
+
+
+    for (int i = 5; i<dataList.length();i++){
+        QStringList items = dataList[i].split(",");
+        QString quantity = QString::number(orderData.count(items[0]));
+        if (!dbQuery.contains(items[0])){
+        dbQuery+="("+orderId+","+clientId +","+items[0]+","+items[2]+","+items[1]+","+quantity+"),";
+        }
+        if (i==(dataList.length()-1))dbQuery.remove(dbQuery.length()-1,1);
+    }
+    ui->serverInfo->append(dbQuery);
+    query.exec(dbQuery);
+    dbQuery.clear();
+
+
+    ui->serverInfo->append(clientId);
+    ui->serverInfo->append(orderId);
+}
+
+QString myServer::generateQuery(const QString &parameters)      //создание select запроса к бд из параметров
+{
+    QString dbQuery = "SELECT details.detailid, details.title, pricelist.price, supplier.name, supplier.supid "
                       "FROM details, pricelist, supplier WHERE details.detailid IN ";
     QString dbSubQuery = "(SELECT ";
     QStringList params = parameters.split(",");

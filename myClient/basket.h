@@ -19,11 +19,14 @@ public:
     QString orderData;
     float totalPrice;
     QStringList idList;
+    QStringList priceList;
+    QStringList supplierList;
+    void clearForms();
     ~basket();
 signals:
     void sendOrderData(QString);
 public slots:
-    void addToBasket(QString,QString,float);
+    void addToBasket(QString,QString,float,QString);
 private slots:
     void on_pushButton_clicked();
 
