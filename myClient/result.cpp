@@ -38,6 +38,7 @@ result::~result()
 
 void result::on_pushButton_clicked()
 {
+    ui->label_2->clear();
     this->close();
 }
 
@@ -72,5 +73,6 @@ void result::on_pushButton_2_clicked()
 
 void result::on_pushButton_3_clicked()
 {
+    ui->label_2->clear();
     emit showBasket();
 }

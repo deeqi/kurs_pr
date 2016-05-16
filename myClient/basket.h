@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QStringList>
 #include <QRegExp>
+#include <QListWidgetItem>
 
 namespace Ui {
 class basket;
@@ -34,6 +35,7 @@ private slots:
 
     void on_deleteButton_clicked();
 
+    void on_listWidget_itemClicked();
 private:
     Ui::basket *ui;
 };

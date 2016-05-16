@@ -96,9 +96,7 @@ void MyClient::slotReadyRead()
 void MyClient::slotError(QAbstractSocket::SocketError err)
 {
     QString strError =
-        "Error: " + (err == QAbstractSocket::HostNotFoundError ?
-                     "The host was not found." :
-                     err == QAbstractSocket::RemoteHostClosedError ?
+        "Error: " +  (err == QAbstractSocket::RemoteHostClosedError ?
                      "The remote host is closed." :
                      err == QAbstractSocket::ConnectionRefusedError ?
                      "The connection was refused." :
@@ -510,7 +508,9 @@ void MyClient::on_sendButton_clicked()              //кнопка "выбрат
         if (ui->arg4_6->isChecked())memory+="16 ";
         userQuery+=memory+",";
     }
-    if (ui->lowPrice->text().toInt() >= ui->maxPrice->text().toInt()){
+    QString lowPrice = ui->lowPrice->text();
+    QString maxPrice = ui->maxPrice->text();
+    if (((!lowPrice.isEmpty()) && (!maxPrice.isEmpty())) && (lowPrice.toInt() >= maxPrice.toInt())){
         ui->priceError->setText("Неправильно указана цена!");
     }
     else emit sendUserQuery(userQuery);

@@ -66,7 +66,6 @@ void myServer::slotReadClient()
         else{
         QSqlQuery query;
         query.exec(generateQuery(str));
-
         QStringList queryResult;
         QString value;
 
@@ -123,16 +122,22 @@ void myServer::insertQuery(const QString &orderData)      //создание ins
     query.exec(dbQuery);
     dbQuery.clear();
 
-    dbQuery = "INSERT INTO orders (clientid,orderid) VALUES ("+clientId+","+orderId+")";
+    dbQuery = "INSERT INTO orders (clientid,orderid,time) VALUES ("+clientId+","+orderId+", NOW())";
     query.exec(dbQuery);
     dbQuery.clear();
 
     dbQuery = "INSERT INTO content (orderid,clientid,detailid,supid,price,quantity) VALUES ";
 
+    QStringList quantityCount;
+    for (int j = 5; j<dataList.length();j++){
+        QString itm = dataList[j];
+        QStringList it = itm.split(",");
+        quantityCount.append(it[0]);
+    }
 
     for (int i = 5; i<dataList.length();i++){
         QStringList items = dataList[i].split(",");
-        QString quantity = QString::number(orderData.count(items[0]));
+        QString quantity = QString::number(quantityCount.count(items[0]));
         if (!dbQuery.contains(items[0])){
         dbQuery+="("+orderId+","+clientId +","+items[0]+","+items[2]+","+items[1]+","+quantity+"),";
         }
@@ -239,7 +244,7 @@ QString myServer::generateQuery(const QString &parameters)      //создани
             if(param6.length()>1)param6.removeLast();
             for (int i=0;i<param6.length();i++){
                  if (i == 0) dbSubQuery+=param6[i]+" ";
-                 if (i > 0) dbSubQuery+="OR memory_type = "+param6[i] +" ";
+                 if (i > 0) dbSubQuery+="OR memory = "+param6[i] +" ";
             }
             dbSubQuery+=") ";
         }
@@ -405,6 +410,7 @@ QString myServer::generateQuery(const QString &parameters)      //создани
             "and pricelist.price <= " + params[2];
 
     dbQuery+=";";
+    ui->serverInfo->append(dbQuery);
     return dbQuery;
 }
 
